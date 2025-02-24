@@ -2,7 +2,6 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import PoseStamped
 
-
 class Vicon(Node):
     def __init__(self):
         super().__init__('vicon')
@@ -25,7 +24,6 @@ class Vicon(Node):
         self.orientation = msg.pose.orientation
         self.timestamp = msg.header.stamp
         self.frame_id = msg.header.frame_id
-
         # Print values normally
         print(f"Position: x={self.position.x}, y={self.position.y}, z={self.position.z}")
         print(f"Orientation: x={self.orientation.x}, y={self.orientation.y}, z={self.orientation.z}, w={self.orientation.w}")
