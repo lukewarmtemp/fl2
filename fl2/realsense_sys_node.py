@@ -32,6 +32,9 @@ class RealSense(Node):
         self.setpoint_publisher = self.create_publisher(PoseStamped, '/mavros/setpoint_position/local', qos_profile)
         self.get_logger().info('Publishing to SetPoint')
 
+        # Setpoint Boolean
+        set_vision_to_setpoint = True
+
         # Statement to end the inits
         self.get_logger().info('Realsense Node All Setup and Started!')
 
@@ -50,7 +53,8 @@ class RealSense(Node):
         
         # Everytime we get stuff, write both immediately
         self.send_vision_pose()
-        # self.send_setpoint()
+        if set_vision_to_setpoint: self.set_pose()
+        self.send_setpoint()
 
 
     def send_vision_pose(self):
