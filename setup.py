@@ -20,9 +20,10 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'realsense_test = fl2.realsense_sys_node:main',
-            'vicon_test = fl2.vicon_sys_node:main',
-            'vision_test = fl2.visionpose_sys_node:main'
+            'realsense_test = fl2.realsense_sys_node_unit:main',
+            'vicon_test = fl2.vicon_sys_node_unit:main',
+            'vision_test = fl2.visionpose_sys_node_unit:main',
+            'full_test = fl2.handle_commands:main'
         ],
     },
 )
