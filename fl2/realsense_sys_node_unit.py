@@ -13,7 +13,7 @@ class RealSense(Node):
         self.position = None
         self.orientation = None
         self.timestamp = None
-        self.frame_id = None
+        self.frame_id = "map"
 
         # Subscriber to RealSense pose data
         self.realsense_subscriber = self.create_subscription(Odometry, '/camera/pose/sample', self.realsense_callback, qos_profile)
@@ -27,7 +27,7 @@ class RealSense(Node):
         self.position = msg.pose.pose.position
         self.orientation = msg.pose.pose.orientation
         self.timestamp = msg.header.stamp
-        self.frame_id = msg.header.frame_id
+        # self.frame_id = msg.header.frame_id
         # Print values correctly
         print(f"Position: x={self.position.x}, y={self.position.y}, z={self.position.z}")
         print(f"Orientation: x={self.orientation.x}, y={self.orientation.y}, z={self.orientation.z}, w={self.orientation.w}")

@@ -16,9 +16,9 @@ class RealSense(Node):
         self.timestamp = None
         self.frame_id = None
 
-        # Initialize SENDING storage variables
-        self.set_position = None
-        self.set_orientation = None
+        # Initialize SENDING storage variables with proper types
+        self.set_position = Point()
+        self.set_orientation = Quaternion()
 
         # Subscriber to RealSense pose data
         self.realsense_subscriber = self.create_subscription(Odometry, '/camera/pose/sample', self.realsense_callback, qos_profile)
@@ -32,18 +32,19 @@ class RealSense(Node):
         self.setpoint_publisher = self.create_publisher(PoseStamped, '/mavros/setpoint_position/local', qos_profile)
         self.get_logger().info('Publishing to SetPoint')
 
-        # Setpoint Boolean
-        set_vision_to_setpoint = True
-
         # Statement to end the inits
         self.get_logger().info('Realsense Node All Setup and Started!')
 
+        self.frame_id = "map"
 
     def realsense_callback(self, msg):
+
+        
+
         self.position = msg.pose.pose.position
         self.orientation = msg.pose.pose.orientation
-        self.timestamp = msg.header.stamp
-        self.frame_id = msg.header.frame_id
+        self.timestamp = self.get_clock().now().to_msg()
+        # self.frame_id = msg.header.frame_id
 
         # Print values normally
         print(f"Position: x={self.position.x}, y={self.position.y}, z={self.position.z}")
@@ -53,7 +54,6 @@ class RealSense(Node):
         
         # Everytime we get stuff, write both immediately
         self.send_vision_pose()
-        if set_vision_to_setpoint: self.set_pose()
         self.send_setpoint()
 
 
@@ -71,19 +71,23 @@ class RealSense(Node):
     def send_setpoint(self):
         # Create a new PoseStamped message to publish to setpoint topic
         setpoint_msg = PoseStamped()
-        setpoint_msg.pose.position = self.set_position
-        setpoint_msg.pose.orientation = self.set_orientation
-        # These are the same
         setpoint_msg.header.stamp = self.timestamp
         setpoint_msg.header.frame_id = self.frame_id
+        setpoint_msg.pose.position = self.set_position
+        setpoint_msg.pose.orientation = self.set_orientation
         # Publish the message to the /mavros/setpoint_position/local topic
         self.setpoint_publisher.publish(setpoint_msg)
 
 
-    def set_pose(self):
+    def set_pose_initial(self):
         # Put the current position into maintained position
-        self.set_position = self.position
-        self.set_orientation = self.orientation
+        self.set_position.x = 0
+        self.set_position.y = 0
+        self.set_position.z = 0
+        self.set_orientation.x = 0
+        self.set_orientation.y = 0
+        self.set_orientation.z = 0
+        self.set_orientation.w = 1
 
 
 # def main(args=None):

@@ -34,12 +34,14 @@ class Vicon(Node):
         # Statement to end the inits
         self.get_logger().info('Vicon Node All Setup and Started!')
 
+        self.frame_id = "map"
+
 
     def vicon_callback(self, msg):
         self.position = msg.pose.position
         self.orientation = msg.pose.orientation
         self.timestamp = msg.header.stamp
-        self.frame_id = msg.header.frame_id
+        # self.frame_id = msg.header.frame_id
 
         # Print values normally
         print(f"Position: x={self.position.x}, y={self.position.y}, z={self.position.z}")
@@ -50,6 +52,7 @@ class Vicon(Node):
         # Everytime we get stuff, write both immediately
         self.send_vision_pose()
         self.send_setpoint()
+        
 
 
     def send_vision_pose(self):
@@ -75,10 +78,15 @@ class Vicon(Node):
         self.setpoint_publisher.publish(setpoint_msg)
 
 
-    def set_pose(self):
+    def set_pose_initial(self):
         # Put the current position into maintained position
-        self.set_position = self.position
-        self.set_orientation = self.orientation
+        self.set_position.x = 0
+        self.set_position.y = 0
+        self.set_position.z = 0
+        self.set_orientation.x = 0
+        self.set_orientation.y = 0
+        self.set_orientation.z = 0
+        self.set_orientation.w = 0
 
 
 # def main(args=None):
