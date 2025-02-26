@@ -44,19 +44,26 @@ class RealSense(Node):
         self.get_logger().info('Realsense Node All Setup and Started!')
 
     def realsense_callback(self, msg):
-        quat = [msg.pose.pose.orientation.x, msg.pose.pose.orientation.y,
-                msg.pose.pose.orientation.z, msg.pose.pose.orientation.w]
-        quat = stf.Rotation.from_quat(quat)
+        # quat = [msg.pose.pose.orientation.x, msg.pose.pose.orientation.y,
+        #         msg.pose.pose.orientation.z, msg.pose.pose.orientation.w]
+        # quat = stf.Rotation.from_quat(quat)
 
-        twist = quat  * self.convert
-        print(twist.as_quat())
-        print(self.orientation)
+        # twist = quat  * self.convert
+        # print(twist.as_quat())
+        # print(self.orientation)
         self.position = msg.pose.pose.position
 
-        self.orientation.x = twist.as_quat()[0]
-        self.orientation.y = twist.as_quat()[1]
-        self.orientation.z = twist.as_quat()[2]
-        self.orientation.w = twist.as_quat()[3]
+        # self.orientation.x = twist.as_quat()[0]
+        # self.orientation.y = twist.as_quat()[1]
+        # self.orientation.z = twist.as_quat()[2]
+        # self.orientation.w = twist.as_quat()[3]
+        self.orientation = msg.pose.pose.orientation
+        self.orientation.x *= -1
+        self.orientation.y *= -1
+        self.orientation.z *= -1
+        self.orientation.w *= -1
+
+        print(self.orientation)
 
         self.timestamp = self.get_clock().now().to_msg() #msg.header.stamp
         # Everytime we get stuff, write both immediately
@@ -66,19 +73,24 @@ class RealSense(Node):
     def vicon_callback(self, msg):
         self.get_logger().info("Recieved Vicon Input")
 
-        quat = [msg.pose.pose.orientation.x, msg.pose.pose.orientation.y,
-                msg.pose.pose.orientation.z, msg.pose.pose.orientation.w]
+        quat = [msg.pose.orientation.x, msg.pose.orientation.y,
+                msg.pose.orientation.z, msg.pose.orientation.w]
         quat = stf.Rotation.from_quat(quat)
 
         twist = quat  * self.convert
 
         self.position = msg.pose.position
         
-        self.orientation.x = twist.as_quat()[0]
-        self.orientation.y = twist.as_quat()[1]
-        self.orientation.z = twist.as_quat()[2]
-        self.orientation.w = twist.as_quat()[3]
-        
+        # self.orientation.x = twist.as_quat()[0]
+        # self.orientation.y = twist.as_quat()[1]
+        # self.orientation.z = twist.as_quat()[2]
+        # self.orientation.w = twist.as_quat()[3]
+        self.orientation = msg.pose.orientation
+        self.orientation.x *= -1
+        self.orientation.y *= -1
+        self.orientation.z *= -1
+        self.orientation.w *= -1
+
         self.timestamp = self.get_clock().now().to_msg()
         # Everytime we get stuff, write both immediately
         self.send_vision_pose()

@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import PoseStamped, Point, Quaternion
 from rclpy.qos import QoSProfile, QoSReliabilityPolicy
 
 qos_profile = QoSProfile(reliability=QoSReliabilityPolicy.BEST_EFFORT, depth=1)
@@ -16,8 +16,8 @@ class Vicon(Node):
         self.frame_id = None
 
         # Initialize SENDING storage variables
-        self.set_position = None
-        self.set_orientation = None
+        self.set_position = Point()
+        self.set_orientation = Quaternion()
 
         # Subscriber to Vicon pose data
         self.vicon_subscriber = self.create_subscription(PoseStamped, '/vicon/ROB498_Drone/ROB498_Drone', self.vicon_callback, 1)
@@ -43,11 +43,16 @@ class Vicon(Node):
         self.timestamp = msg.header.stamp
         # self.frame_id = msg.header.frame_id
 
+        self.orientation.x *= -1
+        self.orientation.y *= -1
+        self.orientation.z *= -1
+        self.orientation.w *= -1
+
         # Print values normally
-        print(f"Position: x={self.position.x}, y={self.position.y}, z={self.position.z}")
-        print(f"Orientation: x={self.orientation.x}, y={self.orientation.y}, z={self.orientation.z}, w={self.orientation.w}")
-        print(f"Timestamp: {self.timestamp.sec}.{self.timestamp.nanosec}")
-        print(f"Frame ID: {self.frame_id}")
+        # print(f"Position: x={self.position.x}, y={self.position.y}, z={self.position.z}")
+        # print(f"Orientation: x={self.orientation.x}, y={self.orientation.y}, z={self.orientation.z}, w={self.orientation.w}")
+        # print(f"Timestamp: {self.timestamp.sec}.{self.timestamp.nanosec}")
+        # print(f"Frame ID: {self.frame_id}")
     
         # Everytime we get stuff, write both immediately
         self.send_vision_pose()

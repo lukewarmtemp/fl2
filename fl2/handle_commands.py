@@ -6,14 +6,19 @@ from std_srvs.srv import Empty, Trigger
 from .realsense_sys_node import RealSense
 from .vicon_sys_node import Vicon
 
+from rclpy.qos import QoSProfile, QoSReliabilityPolicy
+qos_profile = QoSProfile(reliability=QoSReliabilityPolicy.RELIABLE, depth=1)
+
 class CommNode(Node):
     def __init__(self, running_node):
         super().__init__('rob498_drone_1')
+        print('node init')
         self.running_node = running_node  # Store the RealSense or Vicon instance
         self.srv_launch = self.create_service(Trigger, 'rob498_drone_1/comm/launch', self.callback_launch)
         self.srv_test = self.create_service(Trigger, 'rob498_drone_1/comm/test', self.callback_test)
         self.srv_land = self.create_service(Trigger, 'rob498_drone_1/comm/land', self.callback_land)
-        self.srv_abort = self.create_service(Trigger, 'rob498_drone_1/comm/abort', self.callback_abort)
+        self.srv_abort = self.create_service(Trigger, 'rob498_drone_1/comm/abort', self.callback_abort, qos_profile=qos_profile)
+        print('services created')
 
         self.set_init = True
         self.height = 0.3
@@ -32,21 +37,25 @@ class CommNode(Node):
 
     def callback_land(self, request, response):
         print('Land Requested. Your drone should land.')
-        self.running_node.set_position.z = 0
+        self.running_node.set_position.z = 0.0
         self.set_init = True
         return response
 
     def callback_abort(self, request, response):
         print('Abort Requested. Your drone should land immediately due to safety considerations.')
-        self.running_node.set_position.z = 0
+        response.success = True
+        response.message = "Success"
+        self.running_node.set_position.z = 0.0
         return response
 
 def main(args=None):
     rclpy.init(args=args) 
+    print('starting node')
     
-    running_node = RealSense()
+    # running_node = RealSense()
+    running_node = Vicon()
     comm_node = CommNode(running_node)  # Pass RealSense instance
-    rclpy.spin(running_node)  # Start RealSense node
+    # rclpy.spin(running_node)  # Start RealSense node
     rclpy.spin(comm_node)  # Start CommNode
 
     running_node.destroy_node()
