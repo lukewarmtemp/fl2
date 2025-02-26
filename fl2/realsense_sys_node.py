@@ -2,7 +2,7 @@ import rclpy
 from rclpy.node import Node
 from nav_msgs.msg import Odometry
 from rclpy.qos import QoSProfile, QoSReliabilityPolicy
-from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import PoseStamped, Point, Quaternion
 
 qos_profile = QoSProfile(reliability=QoSReliabilityPolicy.BEST_EFFORT, depth=1)
 
@@ -38,13 +38,15 @@ class RealSense(Node):
         self.frame_id = "map"
 
     def realsense_callback(self, msg):
-
-        
-
         self.position = msg.pose.pose.position
         self.orientation = msg.pose.pose.orientation
         self.timestamp = self.get_clock().now().to_msg()
         # self.frame_id = msg.header.frame_id
+
+        self.orientation.x *= -1
+        self.orientation.y *= -1
+        self.orientation.z *= -1
+        self.orientation.w *= -1
 
         # Print values normally
         print(f"Position: x={self.position.x}, y={self.position.y}, z={self.position.z}")
@@ -81,21 +83,21 @@ class RealSense(Node):
 
     def set_pose_initial(self):
         # Put the current position into maintained position
-        self.set_position.x = 0
-        self.set_position.y = 0
-        self.set_position.z = 0
-        self.set_orientation.x = 0
-        self.set_orientation.y = 0
-        self.set_orientation.z = 0
-        self.set_orientation.w = 1
+        self.set_position.x = 0.0
+        self.set_position.y = 0.0
+        self.set_position.z = 0.0
+        self.set_orientation.x = 0.0
+        self.set_orientation.y = 0.0
+        self.set_orientation.z = 0.0
+        self.set_orientation.w = -1.0
 
 
-# def main(args=None):
-#     rclpy.init(args=args)
-#     node = RealSense()
-#     rclpy.spin(node)
-#     node.destroy_node()
-#     rclpy.shutdown()
+def main(args=None):
+    rclpy.init(args=args)
+    node = RealSense()
+    rclpy.spin(node)
+    node.destroy_node()
+    rclpy.shutdown()
 
-# if __name__ == '__main__':
-#     main()
+if __name__ == '__main__':
+    main()

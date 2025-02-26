@@ -23,7 +23,9 @@ setup(
             'realsense_test = fl2.realsense_sys_node_unit:main',
             'vicon_test = fl2.vicon_sys_node_unit:main',
             'vision_test = fl2.visionpose_sys_node_unit:main',
-            'full_test = fl2.handle_commands:main'
+            'full_test = fl2.handle_commands:main',
+            'vicon = fl2.vicon_sys_node:main',
+            'realsense = fl2.realsense_sys_node:main'
         ],
     },
 )

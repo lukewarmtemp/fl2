@@ -49,10 +49,10 @@ class Vicon(Node):
         self.orientation.w *= -1
 
         # Print values normally
-        # print(f"Position: x={self.position.x}, y={self.position.y}, z={self.position.z}")
-        # print(f"Orientation: x={self.orientation.x}, y={self.orientation.y}, z={self.orientation.z}, w={self.orientation.w}")
-        # print(f"Timestamp: {self.timestamp.sec}.{self.timestamp.nanosec}")
-        # print(f"Frame ID: {self.frame_id}")
+        print(f"Position: x={self.position.x}, y={self.position.y}, z={self.position.z}")
+        print(f"Orientation: x={self.orientation.x}, y={self.orientation.y}, z={self.orientation.z}, w={self.orientation.w}")
+        print(f"Timestamp: {self.timestamp.sec}.{self.timestamp.nanosec}")
+        print(f"Frame ID: {self.frame_id}")
     
         # Everytime we get stuff, write both immediately
         self.send_vision_pose()
@@ -85,21 +85,21 @@ class Vicon(Node):
 
     def set_pose_initial(self):
         # Put the current position into maintained position
-        self.set_position.x = 0
-        self.set_position.y = 0
-        self.set_position.z = 0
-        self.set_orientation.x = 0
-        self.set_orientation.y = 0
-        self.set_orientation.z = 0
-        self.set_orientation.w = 0
+        self.set_position.x = 0.0
+        self.set_position.y = 0.0
+        self.set_position.z = 0.0
+        self.set_orientation.x = 0.0
+        self.set_orientation.y = 0.0
+        self.set_orientation.z = 0.0
+        self.set_orientation.w = -1.0
 
 
-# def main(args=None):
-#     rclpy.init(args=args)
-#     node = Vicon()
-#     rclpy.spin(node)
-#     node.destroy_node()
-#     rclpy.shutdown()
+def main(args=None):
+    rclpy.init(args=args)
+    node = Vicon()
+    rclpy.spin(node)
+    node.destroy_node()
+    rclpy.shutdown()
 
-# if __name__ == '__main__':
-#     main()
+if __name__ == '__main__':
+    main()
