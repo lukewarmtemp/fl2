@@ -24,7 +24,7 @@ class CommNode(Node):
         print('services created')
 
         self.set_init = True
-        self.height = 0.3
+        self.height = 1.5
 
         # realsense
 
@@ -40,8 +40,11 @@ class CommNode(Node):
         self.set_orientation.w = -1.0
 
         # Subscriber to RealSense pose data
-        self.realsense_subscriber = self.create_subscription(Odometry, '/camera/pose/sample', self.realsense_callback, qos_profile)
-        self.get_logger().info('Subscribing to RealSense!')
+        # self.realsense_subscriber = self.create_subscription(Odometry, '/camera/pose/sample', self.realsense_callback, qos_profile)
+        # self.get_logger().info('Subscribing to RealSense!')
+
+        self.vicon_subscriber = self.create_subscription(PoseStamped, '/vicon/ROB498_Drone/ROB498_Drone', self.vicon_callback, 1)
+        self.get_logger().info('Subscribing to Vicon!')
         
         # Publisher for VisionPose topic
         self.vision_pose_publisher = self.create_publisher(PoseStamped, '/mavros/vision_pose/pose', 1)
@@ -130,11 +133,32 @@ class CommNode(Node):
         # Put the current position into maintained position
         self.set_position.x = 0.0
         self.set_position.y = 0.0
-        self.set_position.z = 0.1
+        self.set_position.z = 0.0
         self.set_orientation.x = 0.0
         self.set_orientation.y = 0.0
         self.set_orientation.z = 0.0
         self.set_orientation.w = -1.0
+
+    def vicon_callback(self, msg):
+        self.position = msg.pose.position
+        self.orientation = msg.pose.orientation
+        self.timestamp = self.get_clock().now().to_msg()
+        # self.frame_id = msg.header.frame_id
+
+        self.orientation.x *= -1
+        self.orientation.y *= -1
+        self.orientation.z *= -1
+        self.orientation.w *= -1
+
+        # Print values normally
+        print(f"Position: x={self.position.x}, y={self.position.y}, z={self.position.z}")
+        print(f"Orientation: x={self.orientation.x}, y={self.orientation.y}, z={self.orientation.z}, w={self.orientation.w}")
+        print(f"Timestamp: {self.timestamp.sec}.{self.timestamp.nanosec}")
+        print(f"Frame ID: {self.frame_id}")
+    
+        # Everytime we get stuff, write both immediately
+        self.send_vision_pose()
+        self.send_setpoint()
 
 def main(args=None):
     rclpy.init(args=args) 
@@ -150,6 +174,7 @@ def main(args=None):
     # running_node.destroy_node()
     comm_node.destroy_node()
     rclpy.shutdown()
+    
 
 if __name__ == '__main__':
     main()
